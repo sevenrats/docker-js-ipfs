@@ -1,20 +1,19 @@
 #!/usr/bin/env bash
 
 # Proxy signals
-_term() { 
-  echo "Caught SIGTERM signal!"
-  pkill -TERM jsipfs
-  pkill -TERM -P1
-  exit 0
-}
+sp_processes=("jsipfs")
+. ./signalproxy.sh
 
-trap _term SIGTERM
+# Overload Traps
+    #none
 
+# Configure Stuff
 export IPFS_PATH=$IPFS_PATH
 
 if ! [[ -f "$IPFS_PATH/config" ]]; then
     jsipfs init    
 fi
 
-jsipfs daemon &
-wait -n ${!}
+# Run App
+jsipfs daemon & \
+wait -n
