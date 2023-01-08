@@ -8,7 +8,10 @@ sp_processes=("jsipfs")
     #none
 
 # Configure Stuff
-export IPFS_PATH=$IPFS_PATH
+if [[ -d "$IPFS_PATH/repo.lock" ]]; then
+    echo "Automatically removing a stale repo lock."
+    rm -rf $IPFS_PATH/repo.lock    
+fi
 
 if ! [[ -f "$IPFS_PATH/config" ]]; then
     jsipfs init    

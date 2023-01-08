@@ -1,24 +1,23 @@
-FROM alpine
+FROM alpine:3.17
 
-ENV IPFS_VERSION=next
+ENV IPFS_VERSION=latest
 ENV IPFS_MONITORING=1
 ENV IPFS_PATH=/data/ipfs
-ENV BUILD_DEPS='libnspr4 libnspr4-dev libnss3'
 
 RUN \
-    apk add --no-cache catatonit bash procps nodejs npm \
-        build-base python3 wget && \
+    apk add --no-cache catatonit bash procps nodejs && \
+    apk add --no-cache --virtual .build-deps npm git build-base python3 && \
     npm install -g --build-from-source ipfs@"$IPFS_VERSION" && \
     npm cache clear --force && \
-    cd / && \
-    wget https://raw.githubusercontent.com/sevenrats/signalproxy.sh/main/signalproxy.sh && \
-    apk del build-base python3 make npm wget && \
-    rm -rf /node-* /SHASUMS256.txt /tmp/* /root/.electron /root/.cache \
+    git clone --depth 1 https://github.com/sevenrats/bash-signal-proxy.git && \
+    cp bash-signal-proxy/signalproxy.sh / && \
+    apk del .build-deps && \
+    rm -rf bash-signal-proxy /node-* /SHASUMS256.txt /tmp/* /root/.electron /root/.cache \
         /sbin/apk /etc/apk /lib/apk /usr/share/apk /var/lib/apk \ 
         /usr/share/man/* /usr/share/doc /root/.npm /root/.node-gyp /root/.config \
         /usr/lib/node_modules/npm/man /usr/lib/node_modules/npm/doc /usr/lib/node_modules/npm/docs \
         /usr/lib/node_modules/npm/html /usr/lib/node_modules/npm/scripts && \
-    { rm -rf /root/.gnupg || true; } 
+    { rm -rf /root/.gnupg || true; }
 
 RUN \
     ln -s /usr/local/bin/jsipfs /usr/local/bin/ipfs
@@ -30,4 +29,4 @@ EXPOSE 9090
 
 COPY entrypoint.sh /entrypoint.sh
 
-CMD ["catatonit", "/entrypoint.sh", ""]
+CMD ["catatonit", "/entrypoint.sh"]

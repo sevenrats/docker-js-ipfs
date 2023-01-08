@@ -2,7 +2,7 @@
 version: "3"
 services:
   ipfs:
-    image: js-ipfs:latest
+    image: sevenrats/js-ipfs
     container_name: ipfs
     security_opt:
       - no-new-privileges:true
@@ -11,7 +11,7 @@ services:
       - PGID=1000
       - TZ=Europe/London
     volumes:
-      - ./config/ipfs:/data/ipfs
+      - ./data/ipfs:/data/ipfs
     ports:
       - 5002:5002 # HTTP API
       - 9090:9090 # Gateway
